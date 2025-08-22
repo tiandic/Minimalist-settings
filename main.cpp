@@ -280,9 +280,12 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    std::string fileName = "D:/Develop/TDSetting/Qt/setting/test.yaml";
+    std::string fileName = argv[1];
     std::ifstream file(fileName);
-
+    if (!file.is_open()) {
+        std::cerr << "Error: cannot open file '" << fileName << "'" << std::endl;
+        return -1;
+    }
     std::string line;
     // 创建主窗口部件和布局
     QWidget *centralWidget = new QWidget;

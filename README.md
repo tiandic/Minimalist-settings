@@ -1,7 +1,7 @@
 <!--
  * @encode: utf-8
  * @Date: 2025-08-22 21:17:17
- * @LastEditTime: 2025-08-22 21:37:46
+ * @LastEditTime: 2025-08-22 22:04:34
  * @FilePath: /TDSetting/Qt/setting/README.md
 -->
 # 极简设置
@@ -12,7 +12,12 @@
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
 
-使用:
+### 安装:
+由于项目的`releases`编译时使用的是动态链接
+
+所以需要先安装相关`Qt`的依赖
+
+### 使用:
 
 使用yaml格式的配置文件
 
@@ -38,6 +43,19 @@ window:
 wge: "lsdagghrhgewuy"   # //$ title: wge; detail: wget; type: string
 wgw: "和agrwh4g好人" # //$ title: wge; detail: wget; type: string
 ```
+
+通过命令行传递文件路径
+
+打开命令`setting.exe test.yaml`
+
 图形化显示:
+
 ![setup](./READMEimg/em.png)
+
 好像有点丑,hh
+
+### 编译:
+1. 在创建`images`目录,并添加一个`background.png`的图像作为背景,添加一个`checked_icon.png`作为复选框的勾选状态
+
+2. 使用`Qt Creator 17.0.0 (Community)`直接构建即可
+
