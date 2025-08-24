@@ -12,16 +12,10 @@ on:
 
 jobs:
   build:
-    name: Build
     runs-on: windows-latest
     strategy:
       matrix:
-        qt_ver: [6.9.1] # 只选择 Qt 6.9.1
-        qt_target: [desktop]
-        qt_arch: [win64_msvc2019_64, win32_msvc2019] # 仍然保留 msvc2019 架构
-        exclude:
-          - qt_ver: 5.9.8
-            qt_arch: win32_msvc2019
+        qt_arch: [win64_msvc2019_64, win32_msvc2019]
         include:
           - qt_arch: win64_msvc2019_64
             msvc_arch: x64
@@ -31,19 +25,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          version: ${{ matrix.qt_ver }}
-          target: ${{ matrix.qt_target }}
-          arch: ${{ matrix.qt_arch }}
+          python-version: 3.12
 
-      - name: Set up MSVC environment
+      - name: Install aqtinstall
+        run: pip install aqtinstall
+
+      - name: List available Qt architectures
+        run: python -m aqt list-qt windows desktop --arch 6.9.1
+
+      - name: Install Qt 6.9.1
+        run: |
+          python -m aqt install-qt windows desktop 6.9.1 ${{ matrix.qt_arch }} \
+            --timeout 120 \
+            --base https://mirrors.dotsrc.org/qtproject \
+            --external "C:\Program Files\7-Zip\7z.exe"
+
+      - name: Set up MSVC
         shell: cmd
         run: |
-          echo "Finding vcvarsall..."
           for /f "usebackq tokens=*" %%i in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **\vcvarsall.bat`) do set VCVARSALL=%%i
-          echo "Using vcvarsall at %VCVARSALL%"
           call "%VCVARSALL%" ${{ matrix.msvc_arch }}
 
       - name: Build with qmake + nmake
