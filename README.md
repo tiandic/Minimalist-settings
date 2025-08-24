@@ -50,12 +50,16 @@ wgw: "和agrwh4g好人" # //$ title: wge; detail: wget; type: string
 
 图形化显示:
 
-![setup](./READMEimg/em.png)
+![setup](./READMEimg/em2.png)
 
 好像有点丑,hh
 
+v1.0的UI样式:
+
+![setup](./READMEimg/em.png)
+
 ### 编译:
-1. 在创建`images`目录,并添加一个`background.png`的图像作为背景,添加一个`checked_icon.png`作为复选框的勾选状态
+1. 在创建`images`目录,并添加一个`background.png`的图像作为背景
 
 2. 使用`Qt Creator 17.0.0 (Community)`直接构建即可
 

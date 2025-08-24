@@ -215,27 +215,27 @@ RoundedWidget *createCheckBox(std::string title, std::string detail, bool CheckS
     checkBox->setText("");
     checkBox->setFixedSize(30, 30); // 设置为正方形
     checkBox->setStyleSheet(R"(
-        QCheckBox { 
-            background-color: #d3d3d3;
-            border: 3px solid #808080;
-            border-radius: 5px;
-            padding: 0;
-        }
-        QCheckBox::indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 5px;
-            background-color: #d3d3d3;
-            margin: 2px;
-        }
-        QCheckBox::indicator:checked {
-        background-color: black;
+    QCheckBox {
+        background-color: transparent;  /* 设置背景透明 */
+        border: 3px solid #808080;
         border-radius: 5px;
-        image: url(:/images/images/checked_icon.png);
+        padding: 0;
+    }
+    QCheckBox::indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 5px;
+        background-color: transparent;  /* 设置指示器背景透明 */
+        margin: 2px;
+    }
+    QCheckBox::indicator:checked {
+        border-radius: 5px;
+        image: url(:/images/images/checked_icon2.png);
         background-position: center;
         background-repeat: no-repeat;
-        }
-    )");
+    }
+)");
+
     layout->addWidget(checkBox);
     return roundedWidget;
 }

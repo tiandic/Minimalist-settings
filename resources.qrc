@@ -2,6 +2,7 @@
     <qresource prefix="/images">
         <file>images/checked_icon.png</file>
         <file>images/background.png</file>
+        <file>images/checked_icon2.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
