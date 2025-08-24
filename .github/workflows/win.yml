@@ -15,10 +15,12 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
+        qt_ver: [6.8.0]
+        qt_target: [desktop]
         qt_arch: [win64_mingw]
         include:
           - qt_arch: win64_mingw
-            msvc_arch: x64
+            msvc_arch: x86
 
     steps:
       - uses: actions/checkout@v4
@@ -31,10 +33,7 @@ jobs:
       - name: Install aqtinstall
         run: pip install aqtinstall
 
-      - name: List available Qt architectures
-        run: python -m aqt list-qt windows desktop --arch 6.8.0
-
-      - name: Install Qt 6.8.0 (64-bit)
+      - name: Install Qt 6.8.0 (MinGW)
         shell: bash
         run: |
           python -m aqt install-qt windows desktop 6.8.0 ${{ matrix.qt_arch }} \
@@ -42,14 +41,16 @@ jobs:
             --base https://mirrors.dotsrc.org/qtproject \
             --external "C:\Program Files\7-Zip\7z.exe"
 
-      - name: Set up MSVC environment (64-bit)
+      - name: Set up MinGW environment
         shell: cmd
         run: |
-          for /f "usebackq tokens=*" %%i in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **\vcvarsall.bat`) do set VCVARSALL=%%i
-          call "%VCVARSALL%" ${{ matrix.msvc_arch }}
+          set PATH=C:\mingw-w64\bin;%PATH%
+          set QMAKESPEC=win32-g++-mingw
+          set QMAKE_CXXFLAGS=-static
+          set QMAKE_LFLAGS=-static
 
-      - name: Build with qmake + nmake
+      - name: Build with qmake + mingw32-make
         shell: cmd
         run: |
           qmake
-          nmake
+          mingw32-make
