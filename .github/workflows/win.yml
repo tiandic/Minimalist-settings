@@ -1,70 +1,53 @@
-# windows.yml
 name: Windows
-on: 
-  # push代码时触发workflow
+
+on:
   push:
-    # 忽略README.md
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-  # pull_request时触发workflow
+      - "README.md"
+      - "LICENSE"
   pull_request:
-    # 忽略README.md
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
+      - "README.md"
+      - "LICENSE"
+
 jobs:
   build:
     name: Build
-    # 运行平台， windows-latest目前是windows server 2019
     runs-on: windows-latest
     strategy:
-      # 矩阵配置
       matrix:
-        qt_ver: [5.9.8,6.9.1]
+        qt_ver: [6.9.1] # 只选择 Qt 6.9.1
         qt_target: [desktop]
-        # mingw用不了
-        # qt_arch: [win64_msvc2017_64, win32_msvc2017, win32_mingw53,win32_mingw73]
-        qt_arch: [win64_msvc2017_64, win32_msvc2017]
-        # 从矩阵中除外的配置
-        exclude: 
-          # 不存在5.9.8-win32_msvc2017的版本
+        qt_arch: [win64_msvc2019_64, win32_msvc2019] # 仍然保留 msvc2019 架构
+        exclude:
           - qt_ver: 5.9.8
-            qt_arch: win32_msvc2017
-          # mingw用不了
-          # - qt_ver: 5.9.8
-          #   qt_arch: win32_mingw73
-          # - qt_ver: 5.12.6
-          #   qt_arch: win32_mingw53
-        # 额外设置msvc_arch
+            qt_arch: win32_msvc2019
         include:
-          - qt_arch: win64_msvc2017_64
+          - qt_arch: win64_msvc2019_64
             msvc_arch: x64
-          - qt_arch: win32_msvc2017
+          - qt_arch: win32_msvc2019
             msvc_arch: x86
-    # 步骤
+
     steps:
-      # 安装Qt
+      - uses: actions/checkout@v4
+
       - name: Install Qt
-        # 使用外部action。这个action专门用来安装Qt
-        uses: jurplel/install-qt-action@v2.0.0
+        uses: jurplel/install-qt-action@v4
         with:
-          # Version of Qt to install
           version: ${{ matrix.qt_ver }}
-          # Target platform for build
           target: ${{ matrix.qt_target }}
-          # Architecture for Windows/Android
           arch: ${{ matrix.qt_arch }}
-      # 拉取代码
-      - uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
-      # 编译msvc
-      - name: build-msvc
+
+      - name: Set up MSVC environment
         shell: cmd
-        env:
-          vc_arch: ${{ matrix.msvc_arch }}
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %vc_arch%
+          echo "Finding vcvarsall..."
+          for /f "usebackq tokens=*" %%i in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **\vcvarsall.bat`) do set VCVARSALL=%%i
+          echo "Using vcvarsall at %VCVARSALL%"
+          call "%VCVARSALL%" ${{ matrix.msvc_arch }}
+
+      - name: Build with qmake + nmake
+        shell: cmd
+        run: |
           qmake
           nmake
