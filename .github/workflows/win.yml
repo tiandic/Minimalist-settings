@@ -45,12 +45,16 @@ jobs:
         shell: cmd
         run: |
           set PATH=C:\mingw-w64\bin;%PATH%
-          set QMAKESPEC=win32-g++-mingw
-          set QMAKE_CXXFLAGS=-static
-          set QMAKE_LFLAGS=-static
 
-      - name: Build with qmake + mingw32-make
+      - name: Configure with CMake
         shell: cmd
         run: |
-          qmake
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.8.0/minGW_64" -G "MinGW Makefiles"
+
+      - name: Build with CMake
+        shell: cmd
+        run: |
+          cd build
           mingw32-make
