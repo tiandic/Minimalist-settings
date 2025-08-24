@@ -1,48 +1,55 @@
-name: Windows Static Qt Build
+name: Windows
 
 on:
-  push: { paths-ignore: ["README.md", "LICENSE"] }
-  pull_request: { paths-ignore: ["README.md", "LICENSE"] }
+  push:
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+  pull_request:
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
 
 jobs:
-  static-qt:
+  build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        qt_arch: [win64_msvc2019_64]
+        include:
+          - qt_arch: win64_msvc2019_64
+            msvc_arch: x64
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          choco install ninja cmake
-          choco install visualstudio2022buildtools --includeRecommended --quiet
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
 
-      - name: Download Qt Sources
-        run: |
-          # 用 aqtinstall 下载源代码（假设源可用）
-          pip install aqtinstall
-          aqt list-qt windows desktop --arch 6.9.1
-          aqt install-qt windows desktop 6.9.1 win64_msvc2019_64 -m src --outputdir qt_src
+      - name: Install aqtinstall
+        run: pip install aqtinstall
 
-      - name: Build static Qt (x64)
+      - name: List available Qt architectures
+        run: python -m aqt list-qt windows desktop --arch 6.8.0
+
+      - name: Install Qt 6.8.0 (64-bit)
+        shell: bash
+        run: |
+          python -m aqt install-qt windows desktop 6.8.0 ${{ matrix.qt_arch }} \
+            --timeout 120 \
+            --base https://mirrors.dotsrc.org/qtproject \
+            --external "C:\Program Files\7-Zip\7z.exe"
+
+      - name: Set up MSVC environment (64-bit)
         shell: cmd
         run: |
-          cd qt_src/6.9.1/win64_msvc2019_64/Src
-          mkdir build-static && cd build-static
-          cmake .. ^
-            -A x64 ^
-            -DCMAKE_BUILD_TYPE=Release ^
-            -DQT_BUILD_SHARED=OFF ^
-            -DQT_FEATURE_static=ON ^
-            -DCMAKE_INSTALL_PREFIX=%CD%\../install ^
-            -DSKIP=qtwebengine ^
-            -DENABLE_TESTS=OFF
-          cmake --build . --parallel 4
-          cmake --install .
+          for /f "usebackq tokens=*" %%i in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **\vcvarsall.bat`) do set VCVARSALL=%%i
+          call "%VCVARSALL%" ${{ matrix.msvc_arch }}
 
-      - name: Build your project using static Qt
+      - name: Build with qmake + nmake
         shell: cmd
         run: |
-          set QT_STATIC_DIR=%CD%\qt_src\6.9.1\win64_msvc2019_64\install
-          set PATH=%QT_STATIC_DIR%\bin;%PATH%
-          cd your_project
-          qmake -static -spec win32-msvc2019
+          qmake
           nmake
