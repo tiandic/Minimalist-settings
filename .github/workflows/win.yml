@@ -15,9 +15,9 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        qt_arch: [win64_msvc2019_64]
+        qt_arch: [win64_mingw]
         include:
-          - qt_arch: win64_msvc2019_64
+          - qt_arch: win64_mingw
             msvc_arch: x64
 
     steps:
