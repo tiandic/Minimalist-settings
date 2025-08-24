@@ -15,10 +15,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        qt_arch: [win64_msvc2019_64, win32_msvc2019]
+        qt_arch: [win32_msvc2019]
         include:
-          - qt_arch: win64_msvc2019_64
-            msvc_arch: x64
           - qt_arch: win32_msvc2019
             msvc_arch: x86
 
@@ -36,14 +34,15 @@ jobs:
       - name: List available Qt architectures
         run: python -m aqt list-qt windows desktop --arch 6.9.1
 
-      - name: Install Qt 6.9.1
+      - name: Install Qt 6.9.1 (32-bit)
+        shell: bash # 使用 Bash 以正确支持续行
         run: |
           python -m aqt install-qt windows desktop 6.9.1 ${{ matrix.qt_arch }} \
             --timeout 120 \
             --base https://mirrors.dotsrc.org/qtproject \
             --external "C:\Program Files\7-Zip\7z.exe"
 
-      - name: Set up MSVC
+      - name: Set up MSVC environment (32-bit)
         shell: cmd
         run: |
           for /f "usebackq tokens=*" %%i in (`vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -find **\vcvarsall.bat`) do set VCVARSALL=%%i
