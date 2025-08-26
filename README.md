@@ -17,7 +17,7 @@
 
 暂时需要将程序与依赖放在一起
 
-需要安装相关`Qt`的依赖,依赖被我包含在`Minimalist-settings.7z`和`Setup.exe`中
+需要安装相关`Qt`的依赖,依赖被包含在`Minimalist-settings.7z`和`Setup.exe`中
 
 直接使用安装包安装,或者解压压缩包即可使用
 
