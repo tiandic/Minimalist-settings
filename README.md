@@ -62,8 +62,10 @@ v1.0的UI样式:
 
 ![setup](./READMEimg/em.png)
 
+如果需要自定义背景图像,则在`setting.exe`程序所在目录下放置一个`background.png`作为自定义背景
+
 ### 编译:
-1. 在创建`images`目录,并添加一个`background.png`的图像作为背景(上面使用示例的背景图是从网上下载的,具体出处不清楚)
+1. 在创建`images`目录,并添加一个`background.png`的图像作为默认背景(上面使用示例的背景图是从网上下载的,具体出处不清楚)
 
 2. 使用`Qt Creator 17.0.0 (Community)`直接构建即可
 
